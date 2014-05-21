@@ -39,6 +39,11 @@ iframe{background:#e2e5e6;width:100%;height:400px;border:none;overflow:hidden}
 <script src="http://lib.sinaapp.com/js/angular.js/angular-1.1.4/angular.min.js"></script>
 </head>
 <body>
+<div class="header">
+    <span>选择尾巴：</span>
+    <select ng-model="weiboKey" ng-options="app.key as app.name for app in apps"></select>
+</div>
+<iframe src="http://widget.weibo.com/dialog/PublishWeb.php?mid=&default_text=&language=zh_cn&app_src={{weiboKey}}&tag=&title=%E5%8F%91%E5%B8%83%E5%BE%AE%E5%8D%9A&button=publish&redirecttoweb=1"></iframe>
 <div>
     <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
     <!-- weibosrc -->
@@ -50,11 +55,6 @@ iframe{background:#e2e5e6;width:100%;height:400px;border:none;overflow:hidden}
         (adsbygoogle = window.adsbygoogle || []).push({});
     </script>
 </div>
-<div class="header">
-    <span>选择尾巴：</span>
-    <select ng-model="weiboKey" ng-options="app.key as app.name for app in apps"></select>
-</div>
-<iframe src="http://widget.weibo.com/dialog/PublishWeb.php?mid=&default_text=&language=zh_cn&app_src={{weiboKey}}&tag=&title=%E5%8F%91%E5%B8%83%E5%BE%AE%E5%8D%9A&button=publish&redirecttoweb=1"></iframe>
 <script>
     var weiboControl = ['$scope', function($scope){
         $scope.apps = [
