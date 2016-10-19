@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="Chrome=1,IE=edge"/>
+    <title>blank title</title>
+    <meta name="author" content="zhaolong">
+    <meta name="keywords" content="undefined"/>
+    <meta name="description" content="copied by dron's JSDrawer - http://ucren.com/demos/jsdrawer/?file=wen01"/>
+    <style>
+    html{color:#000;background:#fff}
+    body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,code,form,fieldset,legend,input,textarea,p,blockquote,th,td{margin:0;padding:0}
+    html{font-size:12px;-webkit-text-size-adjust:100%}
+    html,button,input,select,textarea{font-family:"Microsoft Yahei",tahoma,arial,simsun,sans-serif;color:#333}
+    a{text-decoration:underline;color:#c00}
+    a:hover{text-decoration:none;color:#c00}
+    .container{width:700px;height:700px;margin:0 auto;position:relative}
+    #paper{width:700px;height:700px;position:absolute;top:0;left:0;z-index:1}
+    #brush{width:6px;height:6px;position:absolute;top:0;left:0;z-index:2;background-color:#333;border-radius:3px;display:none;font-size:0;overflow:hidden}
+    #ai-select{position:absolute;top:10px;right:10px}
+    .copyright{position:absolute;bottom:10px;right:10px}
+    </style>
+    <script type="text/javascript" src="raphael.min.js"></script>
+</head>
+<body>
+<select id="ai-select">
+    <option value="">选择路径文件</option>
+    <option value="data1.js">data1</option>
+    <option value="data2.js">data2</option>
+    <option value="data3.js">data3</option>
+</select>
+<div class="container">
+    <div id="brush"></div>
+    <div id="paper"></div>
+</div>
+<p class="copyright">copied by <a href="http://ucren.com/demos/jsdrawer/" target="_blank">dron's JSDrawer</a></p>
+<script>
+!function(){
+    function elm(id){
+        return document.getElementById(id);
+    }
+
+    function timedChunk(items, process, context, callback) {
+        var todo = items.concat(), delay = 60;
+        setTimeout(function() {
+            process.call(context, todo.shift());
+            if(todo.length > 0) {
+                setTimeout(arguments.callee, delay);
+            } else if(callback) {
+                callback(items);
+            }
+        }, delay);
+    }
+
+    function loadJs(url, callback){
+        var id = 'dynamic-js', node = elm(id), pNode;
+        node && (pNode = node.parentNode,pNode.removeChild(node));
+        node = document.createElement('script');
+        node.onload = node.onerror = node.onreadystatechange = function(){
+            if(/loaded|complete|undefined/.test(node.readyState)){
+                node.onload = node.onerror = node.onreadystatechange = null;
+                callback && callback();
+            }
+        }
+        node.id = id;
+        node.src = url;
+        (pNode || document.getElementsByTagName('head')[0]).appendChild(node);
+    }
+
+    window.onload = function(){
+        var aiSelect = elm('ai-select'),
+            brush = elm('brush'),
+            paper = Raphael(elm("paper"),700,700),
+            reg = /([\d\.]+)[ ,]([\d\.]+)$/;
+
+        function offset(str) {
+            reg.lastIndex = 0;
+            return reg.test(str) ? [RegExp.$1 - 0, RegExp.$2 - 0] : null
+        }
+
+        function position(os) {
+            //console.log(os);
+            os && (brush.style.left = os[0] - 3 + 'px',brush.style.top = os[1] - 3 + 'px');
+        }
+
+        function draw(){
+            var ai = aiSelect.value,
+                textAttr = {'fill':'#c00', 'font-size':'24px', 'font-family':'"Microsoft Yahei",tahoma,arial,simsun,sans-serif'};
+            if(!ai){
+                paper.clear();
+                paper.text(350,250,'看右上角，点之').attr(textAttr);
+                paper.path('M400,200C500,60 550,60 600,50').attr({'arrow-end': 'classic-wide-long','stroke': '#c00', 'stroke-width':2});
+            }else{
+                paper.clear();
+                paper.text(350,250,'正在加载路径文件...').attr(textAttr);
+                loadJs(ai, function(){
+                    paper.clear();
+                    brush.style.display = 'block';
+                    aiSelect.setAttribute('disabled', true);
+                    timedChunk(d, function(item){
+                        position(offset(item));
+                        paper.path(item).attr('stroke', '#333');
+                    }, null, function(){
+                        brush.style.display = 'none';
+                        aiSelect.removeAttribute('disabled');
+                    });
+                })
+            }
+        }
+
+        aiSelect.onchange = draw;
+        draw();
+    }
+}()
+</script>
+<script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-22247564-2']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+</script>
+</body>
+</html>
